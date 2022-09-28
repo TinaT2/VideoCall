@@ -1,6 +1,10 @@
 package com.example.videocall
 
 import android.util.Log
+import com.example.videocall.Constants.KEY_TYPE
+import com.example.videocall.Constants.SDP
+import com.example.videocall.Constants.TYPE_ANSWER_CANDIDATE
+import com.example.videocall.Constants.TYPE_OFFER_CANDIDATE
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -18,14 +22,6 @@ class SignalingClient(
 
     companion object {
         val TAG = this::class.simpleName
-        const val KEY_TYPE = "type"
-        const val SDP = "sdp"
-        const val SDP_CANDIDATE = "sdpCandidate"
-        const val SDP_MID = "sdpMid"
-        const val SDP_LINE_INDEX = "sdpMLineIndex"
-        const val TYPE_OFFER_CANDIDATE = "offerCandidate"
-        const val TYPE_ANSWER_CANDIDATE = "answerCandidate"
-
     }
 
     init {
@@ -104,28 +100,28 @@ class SignalingClient(
         val type = data.getValue(KEY_TYPE).toString()
         val description = data[SDP].toString()
         when (type) {
-            SDPType.OFFER.value -> {
+            SDPTypeEnum.OFFER.value -> {
                 listener.onOfferReceived(
                     SessionDescription(
                         SessionDescription.Type.OFFER,
                         description
                     )
                 )
-                sdpType = SDPType.OFFER.value
+                sdpType = SDPTypeEnum.OFFER.value
             }
-            SDPType.ANSWER.value -> {
+            SDPTypeEnum.ANSWER.value -> {
                 listener.onAnswerReceived(
                     SessionDescription(
                         SessionDescription.Type.ANSWER,
                         description
                     )
                 )
-                sdpType = SDPType.ANSWER.value
+                sdpType = SDPTypeEnum.ANSWER.value
             }
-            SDPType.END_CALL.value -> {
+            SDPTypeEnum.END_CALL.value -> {
                 if (!Constants.isIntiatedNow) {
                     listener.onCallEnded()
-                    sdpType = SDPType.END_CALL.value
+                    sdpType = SDPTypeEnum.END_CALL.value
                 }
             }
         }
@@ -159,23 +155,16 @@ class SignalingClient(
         data: Map<String, Any>
     ) {
         when {
-            sdpType == SDPType.OFFER.value && type == TYPE_OFFER_CANDIDATE -> {
+            sdpType == SDPTypeEnum.OFFER.value && type == TYPE_OFFER_CANDIDATE -> {
                 listener.onIceCandidateReceived(
-                    fillIceCandidate(data)
+                    Constants.fillIceCandidate(data)
                 )
             }
-            sdpType == SDPType.ANSWER.value && type == TYPE_ANSWER_CANDIDATE -> {
-                fillIceCandidate(data)
+            sdpType == SDPTypeEnum.ANSWER.value && type == TYPE_ANSWER_CANDIDATE -> {
+                Constants.fillIceCandidate(data)
             }
         }
     }
-
-    private fun fillIceCandidate(data: Map<String, Any>) =
-        IceCandidate(
-            data[SDP_MID].toString(), Math.toIntExact(
-                data[SDP_LINE_INDEX] as Long
-            ), data[SDP_CANDIDATE].toString()
-        )
 
     fun destroy() {
         job.complete()
