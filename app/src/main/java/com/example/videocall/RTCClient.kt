@@ -146,7 +146,7 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         }
     }
 
-    fun setValueOnFirestoreDB(value: HashMap<String, String>, meetingId: String) {
+    private fun setValueOnFirestoreDB(value: Any, meetingId: String) {
         network.collection(CollectionEnum.CALLS.value)
             .document(meetingId)
             .set(value)

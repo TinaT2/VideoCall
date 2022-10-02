@@ -35,7 +35,7 @@ class SignalingClient(
     var sdpType: String? = null
 
 
-    fun sendCandidate(candidate: IceCandidate?, isJoin: Boolean) = runBlocking {
+    fun sendIceCandidate(candidate: IceCandidate?, isJoin: Boolean) = runBlocking {
         val type = when {
             isJoin -> TYPE_ANSWER_CANDIDATE
             else -> TYPE_OFFER_CANDIDATE
