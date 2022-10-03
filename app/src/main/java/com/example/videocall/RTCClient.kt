@@ -3,6 +3,7 @@ package com.example.videocall
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.example.videocall.Constants.END_CALL_CAPITAL
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.webrtc.*
@@ -18,7 +19,6 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         private const val OFFER_TO_RECEIVE_VIDEO = "OfferToReceiveVideo"
         private const val TRUE = "true"
         private const val ICE_SERVER = "stun:stun.l.google.com:19302"
-        private const val END_CALL_SNAIL = "END_CALL"
     }
 
     private val rootEglBase: EglBase = EglBase.create()
@@ -209,7 +209,7 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
                 peerConnection?.removeIceCandidates(iceCandidateArray.toTypedArray())
             }
 
-        val endCall = hashMapOf(Constants.KEY_TYPE to END_CALL_SNAIL)
+        val endCall = hashMapOf(Constants.KEY_TYPE to END_CALL_CAPITAL)
         setValueOnFirestoreDB(endCall,meetingId)
         peerConnection?.close()
     }

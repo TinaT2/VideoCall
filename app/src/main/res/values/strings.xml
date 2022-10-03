@@ -6,5 +6,7 @@
     <string name="permissionRationaleMessage">This app need the camera and audio to function</string>
     <string name="permissionRationalePositive">Grant</string>
     <string name="permissionRationaleDeny">Deny</string>
+    <string name="newMeetingIdError">Please enter new meeting ID</string>
+    <string name="meetingIdError">Please enter meeting id</string>
 
 </resources>

@@ -25,8 +25,8 @@ class RTCActivity : AppCompatActivity() {
         private const val CAMERA_AUDIO_PERMISSION_REQUEST_CODE = 1
         private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
         private const val AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
-        private const val ARGUMENT_MEETING_ID = "meetingID"
-        private const val ARGUMENT_IS_JOIN = "isJoin"
+         const val ARGUMENT_MEETING_ID = "meetingID"
+         const val ARGUMENT_IS_JOIN = "isJoin"
     }
 
     private lateinit var rtcClient: RTCClient
@@ -58,7 +58,7 @@ class RTCActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_rtc)
         initUiViews()
         initUiComponent()
         initUiListeners()

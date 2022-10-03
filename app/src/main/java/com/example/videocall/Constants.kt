@@ -13,6 +13,9 @@ object Constants {
         const val SDP_LINE_INDEX = "sdpMLineIndex"
         const val TYPE_OFFER_CANDIDATE = "offerCandidate"
         const val TYPE_ANSWER_CANDIDATE = "answerCandidate"
+        const val END_CALL_CAPITAL = "END_CALL"
+        const val OFFER_CAPITAL = "OFFER"
+        const val ANSWER_CAPITAL = "ANSWER"
 
         fun fillIceCandidate(data: Map<String, Any>) =
                 IceCandidate(
