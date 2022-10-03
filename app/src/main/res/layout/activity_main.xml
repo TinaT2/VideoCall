@@ -1,78 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_margin="16dp"
     android:gravity="center"
-    android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <ImageView
         android:id="@+id/image"
-        android:src="@drawable/webrtc"
-        android:layout_marginBottom="16dp"
-        android:layout_centerInParent="true"
         android:layout_width="200dp"
-        android:layout_height="200dp"/>
+        android:layout_height="200dp"
+        android:src="@drawable/webrtc"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
     <com.google.android.material.card.MaterialCardView
-        android:layout_below="@+id/image"
+        android:id="@+id/materialCardView"
         android:layout_width="match_parent"
-        app:cardCornerRadius="16dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         app:cardBackgroundColor="@color/teal_700"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:orientation="vertical"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp">
+
             <TextView
-                android:layout_margin="16dp"
-                android:layout_gravity="center"
-                android:textColor="@color/white"
+                android:id="@+id/textView"
                 style="@style/TextAppearance.AppCompat.Large"
-                android:text="Kotlin Sample"
-                android:elevation="8dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <EditText
-                android:padding="16dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_margin="16dp"
-                android:background="@drawable/curve_background"
-                android:hint="Enter Meeting ID"
+                android:elevation="8dp"
+                android:text="Kotlin Sample"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
                 android:id="@+id/meeting_id"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <LinearLayout
-                android:weightSum="2"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="match_parent"
-                    android:id="@+id/start_meeting"
-                    android:layout_marginBottom="32dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    app:cornerRadius="8dp"
-                    android:textColor="@color/teal_700"
-                    android:layout_weight="1"
-                    app:backgroundTint="@color/white"
-                    android:text="Start Call"
-                    android:layout_height="wrap_content"/>
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="match_parent"
-                    android:id="@+id/join_meeting"
-                    android:layout_marginBottom="32dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    app:cornerRadius="8dp"
-                    android:layout_weight="1"
-                    android:textColor="@color/teal_700"
-                    app:backgroundTint="@color/white"
-                    android:text="Join Call"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/curve_background"
+                android:hint="Enter Meeting ID"
+                android:padding="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/start_meeting"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Start Call"
+                android:textColor="@color/teal_700"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/join_meeting"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/meeting_id" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/join_meeting"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Join Call"
+                android:textColor="@color/teal_700"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/start_meeting"
+                app:layout_constraintTop_toBottomOf="@+id/meeting_id" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
