@@ -178,6 +178,7 @@ class RTCActivity : AppCompatActivity() {
 
         rtcClient.initSurfaceView(remoteView)
         rtcClient.initSurfaceView(localView)
+        rtcClient.startLocalVideoCapture(localView)
         signallingClient = SignalingClient(meetingID,createSignallingClientListener())
         if(!isJoin)
             rtcClient.call(sdpObserver,meetingID)
