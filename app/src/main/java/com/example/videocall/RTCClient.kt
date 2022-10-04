@@ -9,7 +9,6 @@ import com.google.firebase.ktx.Firebase
 import org.webrtc.*
 import org.webrtc.PeerConnection.Observer
 
-
 class RTCClient(context: Application, observer: PeerConnection.Observer) {
 
     companion object {
@@ -19,6 +18,9 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         private const val OFFER_TO_RECEIVE_VIDEO = "OfferToReceiveVideo"
         private const val TRUE = "true"
         private const val ICE_SERVER = "stun:stun.l.google.com:19302"
+        private const val VIDEO_CAPTURE_WIDTH = 320
+        private const val VIDEO_CAPTURE_HEIGHT = 240
+        private const val VIDEO_CAPTURE_FRAME_RATE = 60
     }
 
     private val rootEglBase: EglBase = EglBase.create()
@@ -241,7 +243,7 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
     fun startLocalVideoCapture(localVideoOutput:SurfaceViewRenderer){
         val surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
         (videoCapturer as VideoCapturer).initialize(surfaceTextureHelper, localVideoOutput.context, localVideoSource.capturerObserver)
-        videoCapturer.startCapture(320, 240, 60)
+        videoCapturer.startCapture(VIDEO_CAPTURE_WIDTH, VIDEO_CAPTURE_HEIGHT, VIDEO_CAPTURE_FRAME_RATE)
         localAudioTrack = peerConnectionFactory.createAudioTrack(LOCAL_TRACK_ID + "_audio", audioSource)
         localVideoTrack = peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
         localVideoTrack?.addSink(localVideoOutput)

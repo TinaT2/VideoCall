@@ -83,28 +83,24 @@ class RTCActivity : AppCompatActivity() {
     private fun initUiListeners(){
         audioManager.selectAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
 
-        switchCameraButton.setOnClickListener {
-            rtcClient.switchCamera()
-        }
-        audioOutputButton.setOnClickListener {
-            if(inSpeakerMode){
-                earPieceMode()
-            }else{
-                speakerMode()
-            }
-        }
+        switchCameraListener()
+        audioOutputListener()
+        videoListener()
+        micListener()
+        endCallButtonListener()
+    }
 
-        videoButton.setOnClickListener {
-            if(isVideoPaused){
-                isVideoPaused = false
-                videoButton.setImageResource(R.drawable.ic_baseline_videocam_off_24)
-            }else{
-                isVideoPaused = true
-                videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
-            }
-            rtcClient.enableVideo(isVideoPaused)
+    private fun endCallButtonListener() {
+        endCallButton.setOnClickListener {
+            rtcClient.endCall(meetingID)
+            remoteView.isGone = false
+            Constants.isCallEnded = true
+            finish()
+            startActivity(Intent(this@RTCActivity, MainActivity::class.java))
         }
+    }
 
+    private fun micListener() {
         micButton.setOnClickListener {
             if (isMute) {
                 isMute = false
@@ -115,13 +111,34 @@ class RTCActivity : AppCompatActivity() {
             }
             rtcClient.enableAudio(isMute)
         }
+    }
 
-        endCallButton.setOnClickListener {
-            rtcClient.endCall(meetingID)
-            remoteView.isGone = false
-            Constants.isCallEnded = true
-            finish()
-            startActivity(Intent(this@RTCActivity, MainActivity::class.java))
+    private fun videoListener() {
+        videoButton.setOnClickListener {
+            if (isVideoPaused) {
+                isVideoPaused = false
+                videoButton.setImageResource(R.drawable.ic_baseline_videocam_off_24)
+            } else {
+                isVideoPaused = true
+                videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
+            }
+            rtcClient.enableVideo(isVideoPaused)
+        }
+    }
+
+    private fun audioOutputListener() {
+        audioOutputButton.setOnClickListener {
+            if (inSpeakerMode) {
+                earPieceMode()
+            } else {
+                speakerMode()
+            }
+        }
+    }
+
+    private fun switchCameraListener() {
+        switchCameraButton.setOnClickListener {
+            rtcClient.switchCamera()
         }
     }
 
