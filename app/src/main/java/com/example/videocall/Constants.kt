@@ -6,6 +6,7 @@ import org.webrtc.IceCandidate
 object Constants {
         var isCallEnded: Boolean = false
         var isIntiatedNow : Boolean = true
+        const val SERVER_URL = "serverUrl"
         const val KEY_TYPE = "type"
         const val SDP = "sdp"
         const val SDP_CANDIDATE = "sdpCandidate"

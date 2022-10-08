@@ -3,6 +3,10 @@ package com.example.videocall
 import android.util.Log
 import com.example.videocall.Constants.KEY_TYPE
 import com.example.videocall.Constants.SDP
+import com.example.videocall.Constants.SDP_CANDIDATE
+import com.example.videocall.Constants.SDP_LINE_INDEX
+import com.example.videocall.Constants.SDP_MID
+import com.example.videocall.Constants.SERVER_URL
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -39,11 +43,11 @@ class SignalingClient(
             else -> TypeEnum.TYPE_OFFER_CANDIDATE.value
         }
         val candidateConstant = hashMapOf(
-            "serverUrl" to candidate?.serverUrl,
-            "sdpMid" to candidate?.sdpMid,
-            "sdpMLineIndex" to candidate?.sdpMLineIndex,
-            "sdpCandidate" to candidate?.sdp,
-            "type" to type
+            SERVER_URL to candidate?.serverUrl,
+            SDP_MID to candidate?.sdpMid,
+            SDP_LINE_INDEX to candidate?.sdpMLineIndex,
+            SDP_CANDIDATE to candidate?.sdp,
+            KEY_TYPE to type
         )
 
         network.collection(CollectionEnum.CALLS.value)
@@ -159,7 +163,7 @@ class SignalingClient(
                 )
             }
             sdpType == SDPTypeEnum.ANSWER.value && type == TypeEnum.TYPE_ANSWER_CANDIDATE.value -> {
-                Constants.fillIceCandidate(data)
+                listener.onIceCandidateReceived(Constants.fillIceCandidate(data))
             }
         }
     }
