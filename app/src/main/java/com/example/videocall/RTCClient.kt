@@ -3,7 +3,6 @@ package com.example.videocall
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import com.example.videocall.Constants.END_CALL_CAPITAL
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.webrtc.*
@@ -123,7 +122,7 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
                         Constants.SDP to sessionDescription?.description,
                         Constants.KEY_TYPE to sessionDescription?.type
                     )
-                  setValueOnFirestoreDB(value,meetingId)
+                    setValueOnFirestoreDB(value, meetingId)
                     Log.e(TAG, "onSetSuccess")
                 }
 
@@ -200,8 +199,8 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
                 val iceCandidateArray: MutableList<IceCandidate> = mutableListOf()
                 for (dataSnapshot in it) {
                     if ((dataSnapshot.contains(Constants.KEY_TYPE)) &&
-                        (dataSnapshot[Constants.KEY_TYPE] == Constants.TYPE_OFFER_CANDIDATE ||
-                                dataSnapshot[Constants.KEY_TYPE] == Constants.TYPE_ANSWER_CANDIDATE)
+                        (dataSnapshot[Constants.KEY_TYPE] == TypeEnum.TYPE_OFFER_CANDIDATE.value ||
+                                dataSnapshot[Constants.KEY_TYPE] == TypeEnum.TYPE_ANSWER_CANDIDATE.value)
                     ) {
                         iceCandidateArray.add(
                             Constants.fillIceCandidate(dataSnapshot)
@@ -211,40 +210,51 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
                 peerConnection?.removeIceCandidates(iceCandidateArray.toTypedArray())
             }
 
-        val endCall = hashMapOf(Constants.KEY_TYPE to END_CALL_CAPITAL)
-        setValueOnFirestoreDB(endCall,meetingId)
+        val endCall = hashMapOf(Constants.KEY_TYPE to TypeEnum.END_CALL)
+        setValueOnFirestoreDB(endCall, meetingId)
         peerConnection?.close()
     }
 
-    fun enableVideo(videoEnabled:Boolean){
+    fun enableVideo(videoEnabled: Boolean) {
         localVideoTrack?.setEnabled(videoEnabled)
     }
-    fun enableAudio(audioEnabled:Boolean){
+
+    fun enableAudio(audioEnabled: Boolean) {
         localAudioTrack?.setEnabled(audioEnabled)
     }
 
 
     //todo- try catch
     private fun getVideoCapturer(context: Context) =
-        Camera2Enumerator(context).run{
+        Camera2Enumerator(context).run {
             deviceNames.find {
                 isFrontFacing(it)
-            }?.let{
-                createCapturer(it,null)
-            }?:throw IllegalStateException()
+            }?.let {
+                createCapturer(it, null)
+            } ?: throw IllegalStateException()
         }
 
-    fun initSurfaceView(view: SurfaceViewRenderer) = view.run{
+    fun initSurfaceView(view: SurfaceViewRenderer) = view.run {
         setMirror(true)
         setEnableHardwareScaler(true)
-        init(rootEglBase.eglBaseContext,null)
+        init(rootEglBase.eglBaseContext, null)
     }
 
-    fun startLocalVideoCapture(localVideoOutput:SurfaceViewRenderer){
-        val surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
-        (videoCapturer as VideoCapturer).initialize(surfaceTextureHelper, localVideoOutput.context, localVideoSource.capturerObserver)
-        videoCapturer.startCapture(VIDEO_CAPTURE_WIDTH, VIDEO_CAPTURE_HEIGHT, VIDEO_CAPTURE_FRAME_RATE)
-        localAudioTrack = peerConnectionFactory.createAudioTrack(LOCAL_TRACK_ID + "_audio", audioSource)
+    fun startLocalVideoCapture(localVideoOutput: SurfaceViewRenderer) {
+        val surfaceTextureHelper =
+            SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
+        (videoCapturer as VideoCapturer).initialize(
+            surfaceTextureHelper,
+            localVideoOutput.context,
+            localVideoSource.capturerObserver
+        )
+        videoCapturer.startCapture(
+            VIDEO_CAPTURE_WIDTH,
+            VIDEO_CAPTURE_HEIGHT,
+            VIDEO_CAPTURE_FRAME_RATE
+        )
+        localAudioTrack =
+            peerConnectionFactory.createAudioTrack(LOCAL_TRACK_ID + "_audio", audioSource)
         localVideoTrack = peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
         localVideoTrack?.addSink(localVideoOutput)
         val localStream = peerConnectionFactory.createLocalMediaStream(LOCAL_STREAM_ID)
@@ -253,7 +263,7 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         peerConnection?.addStream(localStream)
     }
 
-    fun switchCamera(){
+    fun switchCamera() {
         videoCapturer.switchCamera(null)
     }
 }

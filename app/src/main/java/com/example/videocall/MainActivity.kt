@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.lang.reflect.Type
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,9 +50,9 @@ class MainActivity : AppCompatActivity() {
                     .document(meetingId.text.toString())
                     .get()
                     .addOnSuccessListener { documentSnapshot ->
-                        if (documentSnapshot[Constants.KEY_TYPE] == Constants.OFFER_CAPITAL
-                            || documentSnapshot[Constants.KEY_TYPE] == Constants.ANSWER_CAPITAL
-                            || documentSnapshot[Constants.KEY_TYPE] == Constants.END_CALL_CAPITAL
+                        if (documentSnapshot[Constants.KEY_TYPE] == TypeEnum.OFFER.value
+                            || documentSnapshot[Constants.KEY_TYPE] == TypeEnum.ANSWER.value
+                            || documentSnapshot[Constants.KEY_TYPE] == TypeEnum.END_CALL.value
                         )
                             meetingId.error = getString(R.string.newMeetingIdError)
                         else {

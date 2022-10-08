@@ -3,8 +3,6 @@ package com.example.videocall
 import android.util.Log
 import com.example.videocall.Constants.KEY_TYPE
 import com.example.videocall.Constants.SDP
-import com.example.videocall.Constants.TYPE_ANSWER_CANDIDATE
-import com.example.videocall.Constants.TYPE_OFFER_CANDIDATE
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -37,8 +35,8 @@ class SignalingClient(
 
     fun sendIceCandidate(candidate: IceCandidate?, isJoin: Boolean) = runBlocking {
         val type = when {
-            isJoin -> TYPE_ANSWER_CANDIDATE
-            else -> TYPE_OFFER_CANDIDATE
+            isJoin -> TypeEnum.TYPE_ANSWER_CANDIDATE.value
+            else -> TypeEnum.TYPE_OFFER_CANDIDATE.value
         }
         val candidateConstant = hashMapOf(
             "serverUrl" to candidate?.serverUrl,
@@ -100,7 +98,7 @@ class SignalingClient(
         val type = data.getValue(KEY_TYPE).toString()
         val description = data[SDP].toString()
         when (type) {
-            SDPTypeEnum.OFFER.value -> {
+            TypeEnum.OFFER.value -> {
                 listener.onOfferReceived(
                     SessionDescription(
                         SessionDescription.Type.OFFER,
@@ -109,7 +107,7 @@ class SignalingClient(
                 )
                 sdpType = SDPTypeEnum.OFFER.value
             }
-            SDPTypeEnum.ANSWER.value -> {
+            TypeEnum.ANSWER.value -> {
                 listener.onAnswerReceived(
                     SessionDescription(
                         SessionDescription.Type.ANSWER,
@@ -118,7 +116,7 @@ class SignalingClient(
                 )
                 sdpType = SDPTypeEnum.ANSWER.value
             }
-            SDPTypeEnum.END_CALL.value -> {
+            TypeEnum.END_CALL.value -> {
                 if (!Constants.isIntiatedNow) {
                     listener.onCallEnded()
                     sdpType = SDPTypeEnum.END_CALL.value
@@ -155,12 +153,12 @@ class SignalingClient(
         data: Map<String, Any>
     ) {
         when {
-            sdpType == SDPTypeEnum.OFFER.value && type == TYPE_OFFER_CANDIDATE -> {
+            sdpType == SDPTypeEnum.OFFER.value && type == TypeEnum.TYPE_OFFER_CANDIDATE.value -> {
                 listener.onIceCandidateReceived(
                     Constants.fillIceCandidate(data)
                 )
             }
-            sdpType == SDPTypeEnum.ANSWER.value && type == TYPE_ANSWER_CANDIDATE -> {
+            sdpType == SDPTypeEnum.ANSWER.value && type == TypeEnum.TYPE_ANSWER_CANDIDATE.value -> {
                 Constants.fillIceCandidate(data)
             }
         }
