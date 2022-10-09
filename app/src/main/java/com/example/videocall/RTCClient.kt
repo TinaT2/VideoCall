@@ -16,7 +16,6 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         private const val FIELD_TRIALS = "WebRTC-H264HighProfile/Enabled/"
         private const val OFFER_TO_RECEIVE_VIDEO = "OfferToReceiveVideo"
         private const val TRUE = "true"
-        private const val ICE_SERVER = "stun:stun.l.google.com:19302"
         private const val VIDEO_CAPTURE_WIDTH = 320
         private const val VIDEO_CAPTURE_HEIGHT = 240
         private const val VIDEO_CAPTURE_FRAME_RATE = 60
@@ -32,7 +31,21 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
     val network = Firebase.firestore
 
     private val iceServer = listOf(
-        PeerConnection.IceServer.builder(ICE_SERVER)
+        PeerConnection.IceServer.builder("turn:openrelay.metered.ca:80")
+            .setUsername("openrelayproject")
+            .setPassword("openrelayproject")
+            .createIceServer(),
+        PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
+            .createIceServer(),
+        PeerConnection.IceServer.builder("stun:openrelay.metered.ca:80")
+            .createIceServer(),
+        PeerConnection.IceServer.builder("turn:192.158.29.39:3478?transport=tcp")
+            .setUsername("28224511:1379330808")
+            .setPassword("JZEOEt2V3Qb0y27GRntt2u2PAYA=")
+            .createIceServer(),
+        PeerConnection.IceServer.builder("turn:192.158.29.39:3478?transport=udp")
+            .setUsername("28224511:1379330808")
+            .setPassword("JZEOEt2V3Qb0y27GRntt2u2PAYA=")
             .createIceServer()
     )
 
@@ -79,7 +92,22 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
 
     private fun PeerConnection.call(sdpObserver: SdpObserver, meetingId: String) {
         createOffer(
-            sdpObserver(sdpObserver, meetingId, SDPTypeEnum.OFFER),
+            object : SdpObserver by sdpObserver {
+                override fun onCreateSuccess(sessionDescription: SessionDescription?) {
+                    setLocalDescription(
+                        sdpObserver(
+                            SDPTypeEnum.OFFER,
+                            sessionDescription,
+                            meetingId
+                        ), sessionDescription
+                    )
+                    sdpObserver.onCreateSuccess(sessionDescription)
+                }
+
+                override fun onCreateFailure(p0: String?) {
+                    Log.e(TAG, "onCreateFailure: $p0")
+                }
+            },
             createMediaConstraints()
         )
     }
@@ -87,7 +115,17 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
 
     private fun PeerConnection.answer(sdpObserver: SdpObserver, meetingId: String) {
         createAnswer(
-            sdpObserver(sdpObserver, meetingId, SDPTypeEnum.ANSWER),
+            object : SdpObserver by sdpObserver {
+                override fun onCreateSuccess(desc: SessionDescription?) {
+                    makeValueToSetOnFirestoreDB(desc, meetingId)
+                    setLocalDescription(sdpObserver(), desc)
+                    sdpObserver.onCreateSuccess(desc)
+                }
+
+                override fun onCreateFailure(p0: String?) {
+                    Log.e(TAG, "onCreateFailureRemote: $p0")
+                }
+            },
             createMediaConstraints()
         )
     }
@@ -99,52 +137,16 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         return constraints
     }
 
-    private fun PeerConnection.sdpObserver(
-        sdpObserver: SdpObserver,
-        meetingId: String,
-        type: SDPTypeEnum
-    ) = object : SdpObserver by sdpObserver {
-        override fun onCreateSuccess(sessionDescription: SessionDescription?) {
-            setLocalDescription(object : SdpObserver {
-                override fun onCreateSuccess(p0: SessionDescription?) {
-                    if (type == SDPTypeEnum.ANSWER)
-                        makeValueToSetOnFirestoreDB()
-                    Log.e(TAG, "onCreateSuccess: Description $p0")
-                }
-
-                override fun onSetSuccess() {
-                    if (type == SDPTypeEnum.OFFER)
-                        makeValueToSetOnFirestoreDB()
-                }
-
-                private fun makeValueToSetOnFirestoreDB() {
-                    val value = hashMapOf(
-                        Constants.SDP to sessionDescription?.description,
-                        Constants.KEY_TYPE to sessionDescription?.type
-                    )
-                    setValueOnFirestoreDB(value, meetingId)
-                    Log.e(TAG, "onSetSuccess")
-                }
-
-                override fun onCreateFailure(p0: String?) {
-                    Log.e(TAG, "onCreateFailure: $p0")
-                }
-
-                override fun onSetFailure(p0: String?) {
-                    Log.e(TAG, "onSetFailure: $p0")
-                }
-
-            }, sessionDescription)
-            sdpObserver.onCreateSuccess(sessionDescription)
-        }
-
-        override fun onSetFailure(p0: String?) {
-            Log.e(TAG, "onSetFailure: $p0")
-        }
-
-        override fun onCreateFailure(p0: String?) {
-            Log.e(TAG, "onCreateFailure: $p0")
-        }
+    private fun makeValueToSetOnFirestoreDB(
+        sessionDescription: SessionDescription?,
+        meetingId: String
+    ) {
+        val value = hashMapOf(
+            Constants.SDP to sessionDescription?.description,
+            Constants.KEY_TYPE to sessionDescription?.type
+        )
+        setValueOnFirestoreDB(value, meetingId)
+        Log.e(TAG, "onSetSuccess")
     }
 
     private fun setValueOnFirestoreDB(value: Any, meetingId: String) {
@@ -155,21 +157,27 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
             .addOnFailureListener { e -> Log.e(TAG, "Error adding document", e) }
     }
 
-    private fun PeerConnection.sdpObserver() = object : SdpObserver {
+    private fun PeerConnection.sdpObserver(
+        sdpType: SDPTypeEnum? = null,
+        sessionDescription: SessionDescription? = null,
+        meetingId: String? = null
+    ) = object : SdpObserver {
         override fun onCreateSuccess(sessionDescription: SessionDescription?) {
             Log.e(TAG, "onCreateSuccessRemoteSession: Description $sessionDescription")
         }
 
+        override fun onCreateFailure(p0: String?) {
+            Log.e(TAG, "onCreateFailure: $p0")
+        }
+
         override fun onSetSuccess() {
+            if (sdpType == SDPTypeEnum.OFFER && meetingId != null)
+                makeValueToSetOnFirestoreDB(sessionDescription, meetingId)
             Log.e(TAG, "onSetSuccessRemoteSession")
         }
 
         override fun onSetFailure(p0: String?) {
             Log.e(TAG, "onSetFailure: $p0")
-        }
-
-        override fun onCreateFailure(p0: String?) {
-            Log.e(TAG, "onCreateFailure: $p0")
         }
     }
 
