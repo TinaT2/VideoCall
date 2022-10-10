@@ -181,12 +181,14 @@ class RTCActivity : AppCompatActivity() {
         rtcClient = RTCClient(application,
             object : PeerConnectionObserver() {
                 override fun onIceCandidate(iceCandidate: IceCandidate?) {
+                    Log.v(Constants.SCENARIO_TAG_LOG+"Acty-PeerConObsvr:","onIceCandidate")
                     super.onIceCandidate(iceCandidate)
                     signallingClient.sendIceCandidate(iceCandidate, isJoin)
                     rtcClient.addIceCandidate(iceCandidate)
                 }
 
                 override fun onAddStream(mediaStream: MediaStream?) {
+                    Log.v(Constants.SCENARIO_TAG_LOG+ "Acty-PeerConObsvr:","onAddStream")
                     super.onAddStream(mediaStream)
                     Log.e(TAG, "onAddStream: $mediaStream")
                     mediaStream?.videoTracks?.get(0)?.addSink(remoteView)
@@ -203,10 +205,12 @@ class RTCActivity : AppCompatActivity() {
 
     private fun createSignallingClientListener() = object : SignalingClientListener{
         override fun onConnectionEstablished() {
+            Log.v(Constants.SCENARIO_TAG_LOG+"Acty-SignalingCL","onConnectionEstablished")
             endCallButton.isClickable = true
         }
 
         override fun onOfferReceived(description: SessionDescription) {
+            Log.v(Constants.SCENARIO_TAG_LOG+ "Acty-SignalingCL","onOfferReceived")
             rtcClient.onRemoteSessionReceived(description)
             Constants.isIntiatedNow = false
             rtcClient.answer(sdpObserver, meetingID)
@@ -214,16 +218,19 @@ class RTCActivity : AppCompatActivity() {
         }
 
         override fun onAnswerReceived(description: SessionDescription) {
+            Log.v(Constants.SCENARIO_TAG_LOG+ "Acty-SignalingCL"," onAnswerReceived")
             rtcClient.onRemoteSessionReceived(description)
             Constants.isIntiatedNow = false
             remoteViewLoading.isGone = true
         }
 
         override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
+            Log.v(Constants.SCENARIO_TAG_LOG+ "Acty-SignalingCL","onIceCandidateReceived")
             rtcClient.addIceCandidate(iceCandidate)
         }
 
         override fun onCallEnded() {
+            Log.v(Constants.SCENARIO_TAG_LOG+ "Acty-SignalingCL","onCallEnded")
             if(!Constants.isCallEnded){
                 Constants.isCallEnded = true
                 rtcClient.endCall(meetingID)

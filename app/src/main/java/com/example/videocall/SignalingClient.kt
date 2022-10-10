@@ -38,6 +38,7 @@ class SignalingClient(
 
 
     fun sendIceCandidate(candidate: IceCandidate?, isJoin: Boolean) = runBlocking {
+        Log.v(Constants.SCENARIO_TAG_LOG +"SignalClnt-sendIce",candidate.toString())
         val type = when {
             isJoin -> TypeEnum.TYPE_ANSWER_CANDIDATE.value
             else -> TypeEnum.TYPE_OFFER_CANDIDATE.value
@@ -101,6 +102,7 @@ class SignalingClient(
     private fun offerAnswerEnd(data: MutableMap<String, Any>) {
         val type = data.getValue(KEY_TYPE).toString()
         val description = data[SDP].toString()
+        Log.v(Constants.SCENARIO_TAG_LOG +"SignalClnt-OfAnsE",data.toString())
         when (type) {
             TypeEnum.OFFER.value -> {
                 listener.onOfferReceived(
@@ -156,6 +158,7 @@ class SignalingClient(
         type: String,
         data: Map<String, Any>
     ) {
+        Log.v(Constants.SCENARIO_TAG_LOG +"SignalClt-cndtAded",sdpType.toString())
         when {
             sdpType == SDPTypeEnum.OFFER.value && type == TypeEnum.TYPE_OFFER_CANDIDATE.value -> {
                 listener.onIceCandidateReceived(

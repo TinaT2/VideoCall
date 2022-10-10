@@ -91,21 +91,23 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
 
 
     private fun PeerConnection.call(sdpObserver: SdpObserver, meetingId: String) {
+        Log.v(Constants.SCENARIO_TAG_LOG+"RTC-call","")
         createOffer(
-            offerAnswerObserver(sdpObserver, meetingId),
+            offerAnswerSDPObserver(sdpObserver, meetingId),
             createMediaConstraints()
         )
     }
 
 
     private fun PeerConnection.answer(sdpObserver: SdpObserver, meetingId: String) {
+        Log.v(Constants.SCENARIO_TAG_LOG+"RTC-answer","")
         createAnswer(
-            offerAnswerObserver(sdpObserver, meetingId),
+            offerAnswerSDPObserver(sdpObserver, meetingId),
             createMediaConstraints()
         )
     }
 
-    private fun PeerConnection.offerAnswerObserver(
+    private fun PeerConnection.offerAnswerSDPObserver(
         sdpObserver: SdpObserver,
         meetingId: String
     ) = object : SdpObserver by sdpObserver {
@@ -143,7 +145,7 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         network.collection(CollectionEnum.CALLS.value)
             .document(meetingId)
             .set(value)
-            .addOnSuccessListener { Log.e(TAG, "DocumentSnapshot added") }
+            .addOnSuccessListener { Log.v(Constants.SCENARIO_TAG_LOG+"RTC-setValueDb",value.toString()) }
             .addOnFailureListener { e -> Log.e(TAG, "Error adding document", e) }
     }
 
@@ -172,6 +174,7 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
         peerConnection?.answer(sdpObserver, meetingID)
 
     fun onRemoteSessionReceived(sessionDescription: SessionDescription) {
+        Log.v(Constants.SCENARIO_TAG_LOG+"RTC-remtSsionReciv",sessionDescription.toString())
         remoteSessionDescription = sessionDescription
         peerConnection?.run {
             setRemoteDescription(sdpObserver(), sessionDescription)
@@ -179,10 +182,12 @@ class RTCClient(context: Application, observer: PeerConnection.Observer) {
     }
 
     fun addIceCandidate(iceCandidate: IceCandidate?) {
+        Log.v(Constants.SCENARIO_TAG_LOG+"RTC-addIceCandidat","")
         peerConnection?.addIceCandidate(iceCandidate)
     }
 
     fun endCall(meetingId: String) {
+        Log.v(Constants.SCENARIO_TAG_LOG+"RTC-endCall","")
         network.collection(CollectionEnum.CALLS.value)
             .document(meetingId)
             .collection(CollectionEnum.CANDIDATES.value)

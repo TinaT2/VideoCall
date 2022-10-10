@@ -12,6 +12,7 @@ object Constants {
         const val SDP_CANDIDATE = "sdpCandidate"
         const val SDP_MID = "sdpMid"
         const val SDP_LINE_INDEX = "sdpMLineIndex"
+        const val SCENARIO_TAG_LOG= "TT2: "
 
         fun fillIceCandidate(data: Map<String, Any>) =
                 IceCandidate(
